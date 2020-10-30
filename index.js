@@ -16,7 +16,7 @@ async function getManagerNames() {
     let queryString = "SELECT * FROM employee WHERE manager_id IS NULL";
 
     const rows = await query(queryString);
-    //console.log("number of rows returned " + rows.length);
+    
     let employeeNames = [];
     for (const employee of rows) {
         employeeNames.push(employee.first_name + " " + employee.last_name);
@@ -27,7 +27,6 @@ async function getManagerNames() {
 async function getRoles() {
     let queryString = "SELECT title FROM role";
     const rows = await query(queryString);
-    //console.log("Number of rows returned: " + rows.length);
 
     let roles = [];
     for (const row of rows) {
@@ -40,7 +39,6 @@ async function getRoles() {
 async function getDepartmentNames() {
     let queryString = "SELECT name FROM department";
     const rows = await query(queryString);
-    //console.log("Number of rows returned: " + rows.length);
 
     let departments = [];
     for (const row of rows) {
@@ -50,7 +48,6 @@ async function getDepartmentNames() {
     return departments;
 }
 
-// Given the name of the department, what is its id?
 async function getDepartmentId(departmentName) {
     let queryString = "SELECT * FROM department WHERE department.name=?";
     let args = [departmentName];
@@ -58,7 +55,6 @@ async function getDepartmentId(departmentName) {
     return rows[0].id;
 }
 
-// Given the name of the role, what is its id?
 async function getRoleId(roleName) {
     let queryString = "SELECT * FROM role WHERE role.title=?";
     let args = [roleName];
@@ -66,9 +62,7 @@ async function getRoleId(roleName) {
     return rows[0].id;
 }
 
-// need to find the employee.id of the named manager
 async function getEmployeeId(fullName) {
-    // First split the name into first name and last name
     let employee = getFirstAndLastName(fullName);
 
     let queryString = 'SELECT id FROM employee WHERE employee.first_name=? AND employee.last_name=?';
@@ -90,7 +84,6 @@ async function getEmployeeNames() {
 
 async function viewAllRoles() {
     console.log("");
-    // SELECT * FROM role;
     let queryString = "SELECT * FROM role";
     const rows = await query(queryString);
     console.table(rows);
@@ -99,8 +92,6 @@ async function viewAllRoles() {
 }
 
 async function viewAllDepartments() {
-    // SELECT * from department;
-   
     let queryString = "SELECT * FROM department";
     const rows = await query(queryString);
     console.log(rows);
@@ -198,10 +189,6 @@ async function addRole(roleInfo) {
     mainPrompt()
 }
 
-/* 
-End of calls to the database
-*/
-
 async function mainPrompt() {
     return inquirer
         .prompt([
@@ -245,7 +232,6 @@ async function getAddEmployeeInfo() {
                 message: "What is the employee's role?",
                 name: "role",
                 choices: [
-                    // populate from db
                     ...roles
                 ]
             },
@@ -254,7 +240,6 @@ async function getAddEmployeeInfo() {
                 message: "Who is the employee's manager?",
                 name: "manager",
                 choices: [
-                    // populate from db
                     ...managers
                 ]
             }
@@ -270,7 +255,6 @@ async function getRemoveEmployeeInfo() {
                 message: "Which employee do you want to remove?",
                 name: "employeeName",
                 choices: [
-                    // populate from db
                     ...employees
                 ]
             }
@@ -307,7 +291,6 @@ async function getRoleInfo() {
                 message: "Which department uses this role?",
                 name: "departmentName",
                 choices: [
-                    // populate from db
                     ...departments
                 ]
             }
@@ -324,7 +307,6 @@ async function getUpdateEmployeeRoleInfo() {
                 message: "Which employee do you want to update?",
                 name: "employeeName",
                 choices: [
-                    // populate from db
                     ...employees
                 ]
             },
@@ -333,7 +315,6 @@ async function getUpdateEmployeeRoleInfo() {
                 message: "What is the employee's new role?",
                 name: "role",
                 choices: [
-                    // populate from db
                     ...roles
                 ]
             }
@@ -402,7 +383,7 @@ async function main() {
 
             case 'Exit': {
                 exitLoop = true;
-                process.exit(0); // successful exit
+                process.exit(0); 
                 return;
             }
 
@@ -412,7 +393,6 @@ async function main() {
     }
 }
 
-// Close your database connection when Node exits
 process.on("exit", async function (code) {
     await db.close();
     return console.log(`About to exit with code ${code}`);
