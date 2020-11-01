@@ -7,9 +7,15 @@ const connection = mysql.createConnection({
     host: "localhost",
     port: 3306,
     user: "root",
-    password: "",
+    password: "password",
     database: "employee_db"
 });
+connection.connect(function (err) {
+    if (err) throw err;
+    // console.log("connection id", connection.threadId);
+    main()
+});
+
 const query = util.promisify(connection.query).bind(connection);
 
 async function getManagerNames() {
@@ -87,25 +93,22 @@ async function viewAllRoles() {
     let queryString = "SELECT * FROM role";
     const rows = await query(queryString);
     console.table(rows);
-    return rows;
-
+    main()
 }
 
 async function viewAllDepartments() {
     let queryString = "SELECT * FROM department";
     const rows = await query(queryString);
-    console.log(rows);
-    mainPrompt()
+    console.table(rows);
+    main()
 }
 
 async function viewAllEmployees() {
     console.log("");
-
-
     let queryString = "SELECT * FROM employee";
     const rows = await query(queryString);
     console.table(rows);
-    mainPrompt()
+    main()
 }
 
 async function viewAllEmployeesByDepartment() {
@@ -114,7 +117,7 @@ async function viewAllEmployeesByDepartment() {
     let queryString = "SELECT first_name, last_name, department.name FROM ((employee INNER JOIN role ON role_id = role.id) INNER JOIN department ON department_id = department.id);";
     const rows = await query(queryString);
     console.table(rows);
-    mainPrompt()
+    main()
 }
 
 
@@ -142,7 +145,7 @@ async function updateEmployeeRole(employeeInfo) {
     let args = [roleId, employee[0], employee[1]];
     const rows = await query(queryString, args);
     console.log(`Updated employee ${employee[0]} ${employee[1]} with role ${employeeInfo.role}`);
-    mainPrompt()
+    main()
 }
 
 async function addEmployee(employeeInfo) {
@@ -154,7 +157,7 @@ async function addEmployee(employeeInfo) {
     let args = [employeeInfo.first_name, employeeInfo.last_name, roleId, managerId];
     const rows = await query(queryString, args);
     console.log(`Added employee ${employeeInfo.first_name} ${employeeInfo.last_name}.`);
-    mainPrompt()
+    main()
 }
 
 async function removeEmployee(employeeInfo) {
@@ -164,17 +167,16 @@ async function removeEmployee(employeeInfo) {
     let args = [employeeName[0], employeeName[1]];
     const rows = await query(queryString, args);
     console.log(`Employee removed: ${employeeName[0]} ${employeeName[1]}`);
-    mainPrompt()
+    main()
 }
 
 async function addDepartment(departmentInfo) {
-    console.log("test");
     const departmentName = departmentInfo.departmentName;
     let queryString = 'INSERT into department (name) VALUES (?)';
     let args = [departmentName];
     const rows = await query(queryString, args);
     console.log(`Added department named ${departmentName}`);
-    mainPrompt()
+    main()
 }
 
 async function addRole(roleInfo) {
@@ -186,7 +188,7 @@ async function addRole(roleInfo) {
     let args = [title, salary, departmentId];
     const rows = await query(queryString, args);
     console.log(`Added role ${title}`);
-    mainPrompt()
+    main()
 }
 
 async function mainPrompt() {
@@ -324,7 +326,7 @@ async function getUpdateEmployeeRoleInfo() {
 
 async function main() {
     let exitLoop = false;
-    while (!exitLoop) {
+   
         const prompt = await mainPrompt();
 
         switch (prompt.action) {
@@ -390,7 +392,7 @@ async function main() {
             default:
                 console.log(`Internal warning. Shouldn't get here. action was ${prompt.action}`);
         }
-    }
+    
 }
 
 process.on("exit", async function (code) {
@@ -398,4 +400,3 @@ process.on("exit", async function (code) {
     return console.log(`About to exit with code ${code}`);
 });
 
-main();
